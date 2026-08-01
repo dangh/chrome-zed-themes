@@ -80,6 +80,8 @@ def main():
     ap.add_argument("--target", default="default", choices=["default", "trustedTesters"])
     ap.add_argument("--dist", default=HERE / "dist", type=Path)
     ap.add_argument("--dry-run", action="store_true", help="build the zips, skip the API")
+    ap.add_argument("--check", action="store_true",
+                    help="verify the credentials mint an access token, then stop")
     ap.add_argument("--themes", default="",
                     help="whitespace-separated slugs, so callers need no shell splitting")
     ap.add_argument("slugs", nargs="*", help="themes to publish; default is every configured one")
@@ -88,6 +90,13 @@ def main():
     bad = [s for s in slugs if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", s)]
     if bad:
         sys.exit(f"not theme slugs: {', '.join(bad)}")
+
+    if args.check:
+        # Worth having before any items exist: the only part of the pipeline that
+        # can be verified without an item id is the token exchange.
+        access_token()
+        print("credentials OK: refresh token exchanged for an access token")
+        return
 
     items_file = HERE / "store-items.json"
     if not items_file.is_file():

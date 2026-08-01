@@ -129,7 +129,10 @@ exactly the themes in that tag rather than a rebuild against whatever Zed's
 upstream themes look like that day.
 
 `python3 tools/publish.py --version 1.0.7 --dry-run` builds the zips locally
-without touching the API, which is worth running before the first real publish.
+without touching the API, and `--check` verifies the credentials mint an access
+token without needing any item ids yet. The workflow exposes the latter as the
+`check_only` input, so the secrets can be validated in CI before the store has
+anything in it.
 
 Three things have to be set up once:
 
