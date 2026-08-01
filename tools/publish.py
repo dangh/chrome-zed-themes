@@ -123,10 +123,15 @@ def main():
             if not ok:
                 broken.append(slug)
         if broken:
-            print("\nNOT_FOUND on every projection usually means the refresh token "
-                  "belongs to a\ndifferent Google account than the one that owns "
-                  "these items, rather than a\nbad id -- the API reports an id it "
-                  "cannot resolve the same way as one that\ndoes not exist.")
+            print("\nNOT_FOUND on every projection has two innocent readings and one\n"
+                  "real problem, and the API does not distinguish them:\n"
+                  "  - the item was submitted but has never been published, so it has\n"
+                  "    neither a pending draft nor a published version yet\n"
+                  "  - the item is mid-review, which clears the draft\n"
+                  "  - the refresh token belongs to a different Google account than the\n"
+                  "    one that owns the items\n"
+                  "If the accounts match, re-run this once review has cleared: an\n"
+                  "approved item reports published=SUCCESS.")
             sys.exit(f"unreachable items: {', '.join(broken)}")
         if items:
             print(f"all {len(items)} configured item(s) reachable")
