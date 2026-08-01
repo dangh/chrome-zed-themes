@@ -7,3 +7,6 @@ tools/chrome-prof/
 
 # Chrome drops this into whichever theme folder is loaded unpacked
 Cached Theme.pak
+
+# zips/ are for the one-time manual uploads that create each store item
+zips/

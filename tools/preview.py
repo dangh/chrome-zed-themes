@@ -16,7 +16,11 @@ import time
 
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 PROF = os.path.join(tempfile.gettempdir(), "chrome-gruvbox-preview-profile")
-X, Y, W, H = 40, 80, 1100, 700
+X, Y = 40, 80
+# Store screenshots must be exactly 1280x800, so the window can be asked for that
+# aspect and the retina capture downscaled with no cropping or distortion.
+W = int(os.environ.get("WIN_W", 1100))
+H = int(os.environ.get("WIN_H", 700))
 CAP_H = int(os.environ.get("CAP_H", 260))
 UNFOCUSED = bool(os.environ.get("UNFOCUSED"))
 
@@ -59,7 +63,8 @@ proc = subprocess.Popen(
      "--no-first-run", "--no-default-browser-check", "--disable-sync"]
     + (["--enable-features=VerticalTabs,VerticalTabStrip"] if os.environ.get("VERTICAL") else [])
     + [
-     f"--window-size={W},{H}", f"--window-position={X},{Y}", "about:blank"],
+     f"--window-size={W},{H}", f"--window-position={X},{Y}",
+     os.environ.get("START_URL", "about:blank")],
     pass_fds=(3, 4), close_fds=True)
 os.close(3)
 os.close(4)
