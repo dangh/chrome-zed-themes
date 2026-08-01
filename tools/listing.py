@@ -117,6 +117,78 @@ def screenshot(slug, out):
     raw.unlink()
 
 
+def listing(name, style, appearance):
+    """Store listing copy, with the claims that vary by theme decided per theme.
+
+    Two of them are not true across the board: the address bar can only be aimed
+    at the editor background on palettes where the omnibox seed applies, and on
+    dark themes the unfocused compensation clips at black, so the wording is
+    softened rather than overstated.
+    """
+    panel = build.rgb(style["panel.background"])
+    editor = build.rgb(style["editor.background"])
+    seeded = build.omnibox_seed(editor, panel) != panel
+    over = (1 - build.INACTIVE_ALPHA) * 255
+    clips = any((c - over) / build.INACTIVE_ALPHA < 0
+                for c in build.rgb(style["title_bar.background"]))
+
+    bullets = [
+        "Title bar and tab strip take Zed's title bar colour, with a soft gradient\n"
+        "  along the window's top edge",
+        "Toolbar and the active tab take Zed's sidebar colour",
+        "Inactive tabs carry no fill of their own \u2014 they disappear into the title\n"
+        "  bar, the way Zed's own tab bar reads, in both horizontal and vertical tab\n"
+        "  layouts",
+        "The new tab page uses Zed's blank-window background",
+    ]
+    if seeded:
+        bullets.append("The address bar is aimed at Zed's editor background")
+    bullets.append(
+        "The title bar holds its tone when the window loses focus, rather than\n"
+        "  washing out to a pale grey" if clips else
+        "The title bar keeps its colour when the window loses focus, instead of\n"
+        "  washing out to grey the way most themes do")
+
+    summary = (f"Chrome in Zed's {name}: title bar, tabs, toolbar and new tab page "
+               "taken from the editor's own theme file.")
+    assert len(summary) <= 132, (len(summary), summary)
+    body = "\n".join(f"\u2022 {b}" for b in bullets)
+    return f"""# {name} (Zed)
+
+## Title ({len(name) + 6}/75)
+
+{name} (Zed)
+
+## Summary ({len(summary)}/132)
+
+{summary}
+
+## Description
+
+{name}, lifted straight from the Zed editor's theme file, so Chrome and Zed can
+sit side by side without a colour clash.
+
+What's matched to the editor:
+
+{body}
+
+Generated from Zed's published theme JSON rather than eyeballed, and checked
+against real Chrome renders pixel by pixel.
+
+Source and build script: https://github.com/dangh/chrome-zed-themes
+
+## Assets
+
+- Store icon: icon-128.png
+- Screenshot: screenshot-1280x800.png
+- Small promo tile: promo-440x280.png
+
+## Category
+
+Themes \u00b7 {appearance}
+"""
+
+
 def tile(shot, out):
     """440x280 promo tile from the screenshot, cropped to aspect then scaled."""
     crop_w = round(SHOT_H * TILE_W / TILE_H)
@@ -133,7 +205,8 @@ def main():
     styles = {}
     for path in sorted((HERE / ".zed-themes").glob("*.json")):
         for t in json.loads(path.read_text())["themes"]:
-            styles[re.sub(r"[^a-z0-9]+", "-", t["name"].lower()).strip("-")] = t["style"]
+            slug = re.sub(r"[^a-z0-9]+", "-", t["name"].lower()).strip("-")
+            styles[slug] = (t["name"], t["style"], t["appearance"])
 
     slugs = args or sorted(p.name for p in (HERE / "dist").iterdir() if p.is_dir())
     for slug in slugs:
@@ -141,8 +214,10 @@ def main():
             sys.exit(f"no Zed theme matches {slug!r}; run build.py --fetch first")
         out = HERE / "assets" / slug
         out.mkdir(parents=True, exist_ok=True)
-        write_png(out / "icon-128.png", icon(styles[slug]))
-        print(f"{slug}: icon-128.png", end="", flush=True)
+        name, style, appearance = styles[slug]
+        write_png(out / "icon-128.png", icon(style))
+        (out / "listing.md").write_text(listing(name, style, appearance))
+        print(f"{slug}: icon-128.png + listing.md", end="", flush=True)
         shot = out / "screenshot-1280x800.png"
         if shots:
             screenshot(slug, shot)
