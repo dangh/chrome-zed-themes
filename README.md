@@ -134,11 +134,19 @@ token without needing any item ids yet. The workflow exposes the latter as the
 `check_only` input, so the secrets can be validated in CI before the store has
 anything in it.
 
-`python3 tools/listing.py [slug ...]` generates the two listing assets the
-dashboard demands, into `assets/<slug>/`: a 128x128 icon drawn from the theme's
-own colors, and a 1280x800 screenshot that is a real capture of Chrome wearing
-the theme. Both are exactly the dimensions the store requires — the window is
-asked for 1280x800 so the retina capture downscales with no cropping. Only the
+`python3 tools/listing.py [slug ...]` generates every listing asset the dashboard
+demands, into `assets/<slug>/`:
+
+| file | what it is |
+|---|---|
+| `icon-128.png` | 128x128, drawn from the theme's own colors |
+| `screenshot-1280x800.png` | a real capture of Chrome wearing the theme |
+| `promo-440x280.png` | the small tile, without which the dashboard refuses to publish ("Small tile image is missing") |
+
+All three are exactly the dimensions the store requires: the preview window is
+asked for 1280x800 so the retina capture downscales without cropping, and the tile
+is cropped to its own 1.571:1 aspect before scaling rather than squashed into it.
+`--no-shots` skips the Chrome runs and reuses the existing screenshot. Only the
 description is left to write by hand.
 
 Three things have to be set up once:

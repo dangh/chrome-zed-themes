@@ -4,9 +4,9 @@
     python3 tools/listing.py                 every theme in dist/
     python3 tools/listing.py gruvbox-dark    just these
 
-Writes assets/<slug>/icon-128.png and, unless --no-shots is passed,
-assets/<slug>/screenshot-1280x800.png. Both dimensions are what the store
-requires exactly.
+Writes assets/<slug>/ with icon-128.png, screenshot-1280x800.png (unless
+--no-shots) and promo-440x280.png, the small tile the dashboard requires before it
+will let an item publish. All three are exactly the dimensions the store demands.
 
 The icon is drawn from the theme's own colors as a miniature browser window. The
 screenshot is a real capture of Chrome wearing the theme, taken by preview.py at
@@ -27,6 +27,10 @@ from pathlib import Path
 HERE = Path(__file__).parent.parent
 ICON = 128
 SHOT_W, SHOT_H = 1280, 800
+# The dashboard refuses to publish without this one ("Small tile image is
+# missing"). 440x280 is 1.571:1 against the screenshot's 1.6:1, so the shot is
+# cropped to the tile's aspect before scaling rather than squashed into it.
+TILE_W, TILE_H = 440, 280
 
 spec = importlib.util.spec_from_file_location("build", HERE / "build.py")
 build = importlib.util.module_from_spec(spec)
@@ -113,6 +117,15 @@ def screenshot(slug, out):
     raw.unlink()
 
 
+def tile(shot, out):
+    """440x280 promo tile from the screenshot, cropped to aspect then scaled."""
+    crop_w = round(SHOT_H * TILE_W / TILE_H)
+    subprocess.run(["sips", "-c", str(SHOT_H), str(crop_w), str(shot), "--out", str(out)],
+                   check=True, capture_output=True)
+    subprocess.run(["sips", "--resampleHeightWidth", str(TILE_H), str(TILE_W), str(out)],
+                   check=True, capture_output=True)
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     shots = "--no-shots" not in sys.argv[1:]
@@ -130,9 +143,13 @@ def main():
         out.mkdir(parents=True, exist_ok=True)
         write_png(out / "icon-128.png", icon(styles[slug]))
         print(f"{slug}: icon-128.png", end="", flush=True)
+        shot = out / "screenshot-1280x800.png"
         if shots:
-            screenshot(slug, out / "screenshot-1280x800.png")
+            screenshot(slug, shot)
             print(" + screenshot-1280x800.png", end="")
+        if shot.is_file():
+            tile(shot, out / "promo-440x280.png")
+            print(" + promo-440x280.png", end="")
         print()
 
 
