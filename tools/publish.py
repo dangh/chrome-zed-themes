@@ -109,16 +109,24 @@ def main():
         auth = (("Authorization", f"Bearer {token}"), ("x-goog-api-version", "2"))
         broken = []
         for slug, item_id in items.items():
-            # Reaching each item now catches a typo'd or unowned id here rather
-            # than part way through a publish.
-            got = request(ITEM_URL.format(id=item_id) + "?projection=DRAFT",
-                          headers=auth, fatal=False)
-            if "_error" in got:
-                print(f"  {slug}: UNREACHABLE {item_id} -- {got['_error']}")
+            # A 200 here does not mean the item is ours: the API answers 200 with
+            # uploadState NOT_FOUND for an id it cannot resolve for this account,
+            # so both projections are probed and only SUCCESS counts as reachable.
+            states = {}
+            for projection in ("DRAFT", "PUBLISHED"):
+                got = request(f"{ITEM_URL.format(id=item_id)}?projection={projection}",
+                              headers=auth, fatal=False)
+                states[projection] = got.get("_error") or got.get("uploadState", "?")
+            ok = "SUCCESS" in states.values()
+            print(f"  {slug}: {'ok' if ok else 'NOT REACHABLE'} "
+                  f"draft={states['DRAFT']} published={states['PUBLISHED']}")
+            if not ok:
                 broken.append(slug)
-            else:
-                print(f"  {slug}: ok, uploadState {got.get('uploadState', '?')}")
         if broken:
+            print("\nNOT_FOUND on every projection usually means the refresh token "
+                  "belongs to a\ndifferent Google account than the one that owns "
+                  "these items, rather than a\nbad id -- the API reports an id it "
+                  "cannot resolve the same way as one that\ndoes not exist.")
             sys.exit(f"unreachable items: {', '.join(broken)}")
         if items:
             print(f"all {len(items)} configured item(s) reachable")
