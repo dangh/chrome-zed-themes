@@ -33,7 +33,10 @@ UPLOAD_URL = "https://www.googleapis.com/upload/chromewebstore/v1.1/items/{id}"
 PUBLISH_URL = "https://www.googleapis.com/chromewebstore/v1.1/items/{id}/publish"
 
 
-def request(url, data=None, method=None, headers=(), form=False):
+ITEM_URL = "https://www.googleapis.com/chromewebstore/v1.1/items/{id}"
+
+
+def request(url, data=None, method=None, headers=(), form=False, fatal=True):
     if form:
         data = urllib.parse.urlencode(data).encode()
     req = urllib.request.Request(url, data=data, method=method)
@@ -43,7 +46,10 @@ def request(url, data=None, method=None, headers=(), form=False):
         with urllib.request.urlopen(req, timeout=120) as r:
             body = r.read()
     except urllib.error.HTTPError as e:
-        sys.exit(f"{method or 'GET'} {url} -> HTTP {e.code}\n{e.read().decode(errors='replace')}")
+        detail = f"HTTP {e.code}: {e.read().decode(errors='replace').strip()}"
+        if fatal:
+            sys.exit(f"{method or 'GET'} {url} -> {detail}")
+        return {"_error": detail}
     return json.loads(body) if body else {}
 
 
@@ -91,18 +97,32 @@ def main():
     if bad:
         sys.exit(f"not theme slugs: {', '.join(bad)}")
 
-    if args.check:
-        # Worth having before any items exist: the only part of the pipeline that
-        # can be verified without an item id is the token exchange.
-        access_token()
-        print("credentials OK: refresh token exchanged for an access token")
-        return
-
     items_file = HERE / "store-items.json"
     if not items_file.is_file():
         sys.exit(f"{items_file} not found -- see the docstring for what it holds")
     items = {k: v for k, v in json.loads(items_file.read_text()).items()
              if not k.startswith("_")}
+
+    if args.check:
+        token = access_token()
+        print("credentials OK: refresh token exchanged for an access token")
+        auth = (("Authorization", f"Bearer {token}"), ("x-goog-api-version", "2"))
+        broken = []
+        for slug, item_id in items.items():
+            # Reaching each item now catches a typo'd or unowned id here rather
+            # than part way through a publish.
+            got = request(ITEM_URL.format(id=item_id) + "?projection=DRAFT",
+                          headers=auth, fatal=False)
+            if "_error" in got:
+                print(f"  {slug}: UNREACHABLE {item_id} -- {got['_error']}")
+                broken.append(slug)
+            else:
+                print(f"  {slug}: ok, uploadState {got.get('uploadState', '?')}")
+        if broken:
+            sys.exit(f"unreachable items: {', '.join(broken)}")
+        if items:
+            print(f"all {len(items)} configured item(s) reachable")
+        return
     if slugs:
         unknown = [s for s in slugs if s not in items]
         if unknown:

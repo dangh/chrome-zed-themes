@@ -17,7 +17,9 @@ on:
         description: "Who sees it"
         type: choice
         options: [default, trustedTesters]
-        default: trustedTesters
+        # `default` means the public listing. trustedTesters would narrow an item
+        # that is already submitted publicly, so it is not the safe default here.
+        default: default
       version:
         description: "Version to ship. Empty derives 1.0.<run number>."
         required: false

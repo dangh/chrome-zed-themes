@@ -166,6 +166,11 @@ Three things have to be set up once:
    `CWS_REFRESH_TOKEN`.
 
 Versions must increase — the store rejects a re-upload at the same version — so a
-manual run without an explicit version uses `1.0.<run number>`. Note that the
-`default` target submits for review rather than going live immediately;
-`trustedTesters` is the safer choice for a first run and is the manual default.
+manual run without an explicit version uses `1.0.<run number>`. The `default`
+target submits to the public listing and is what you want for an item already
+submitted publicly; `trustedTesters` would narrow it to testers instead, so pick
+that deliberately or not at all.
+
+`--check` also reaches every id in `store-items.json` and reports its
+`uploadState`, so a typo'd or unowned id surfaces before a publish touches
+anything.
