@@ -1,4 +1,14 @@
 {
-  "_comment": "Chrome Web Store item ids, {theme-slug: item_id}. Only themes listed here are published. Create each item once by hand in the Developer Dashboard (upload any zip) to get its id, then paste it below. Keys must match folder names under dist/.",
-  "_example": "gruvbox-light-soft: put the 32-character id from the dashboard URL here"
+  "_comment": "Chrome Web Store item ids, {theme-slug: item_id}. Only themes listed here are published. Keys must match folder names under dist/.",
+  "ayu-dark": "bnbakndhbfdphofjllhendldoojadicp",
+  "ayu-light": "ccpecjjookbimbaigglbgepmjegcfklj",
+  "ayu-mirage": "kmnopccbobihlakoijjhbnnfgcjoeoma",
+  "gruvbox-dark": "kaepgfbocknlecjllhdbkhelddllbnlo",
+  "gruvbox-dark-hard": "gmhgkhjmfkoidjlnplbepddllfbknmnl",
+  "gruvbox-dark-soft": "mlhgnfejcfadbbkgpffacmiajgcfcjpj",
+  "gruvbox-light": "dackcjbaibfgjjogagofpnddoaaiibcc",
+  "gruvbox-light-hard": "kfgncgejlmmlndfkcjlmnoodjlalonic",
+  "gruvbox-light-soft": "gbbalomapkkefchfongemmfaalodebci",
+  "one-dark": "bacmpkbaildjlhmeebmcchkieidnndlk",
+  "one-light": "figigcdfohnjnmgnmcpdlomlakpnkjmo"
 }
