@@ -1,0 +1,76 @@
+name: Publish to Chrome Web Store
+
+# Publishes the committed dist/ as-is, rewriting only the manifest version, so a
+# tag ships exactly the themes in that tag rather than a rebuild against whatever
+# Zed's upstream themes look like at publish time.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      themes:
+        description: "Theme slugs, space separated. Empty publishes every theme in store-items.json."
+        required: false
+        default: ""
+      target:
+        description: "Who sees it"
+        type: choice
+        options: [default, trustedTesters]
+        default: trustedTesters
+      version:
+        description: "Version to ship. Empty derives 1.0.<run number>."
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+# Never let two runs upload to the same item at once.
+concurrency:
+  group: chrome-web-store
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Resolve version
+        id: meta
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          version="$INPUT_VERSION"
+          if [ -z "$version" ] && [ "$GITHUB_REF_TYPE" = tag ]; then
+            version="${GITHUB_REF_NAME#v}"
+          fi
+          # The store rejects a version that is not higher than the published one,
+          # and run numbers only ever increase.
+          if [ -z "$version" ]; then
+            version="1.0.$GITHUB_RUN_NUMBER"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "shipping version $version"
+
+      - name: Publish
+        env:
+          CWS_CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
+          CWS_CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
+          CWS_REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
+          # Passed through the environment rather than interpolated into the shell.
+          THEMES: ${{ inputs.themes }}
+          TARGET: ${{ inputs.target || 'default' }}
+          VERSION: ${{ steps.meta.outputs.version }}
+        # Every value is quoted from the environment: nothing here is interpolated
+        # into the shell, and publish.py splits and validates the slugs itself.
+        run: |
+          python3 tools/publish.py \
+            --version "$VERSION" \
+            --target "$TARGET" \
+            --themes "$THEMES"

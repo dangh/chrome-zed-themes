@@ -119,3 +119,35 @@ Findings from measuring real renders (Chrome 151), which shape the mapping above
 
 One theme is emitted per Gruvbox variant in the source file — currently dark,
 dark-hard, dark-soft, light, light-hard, light-soft.
+
+## Publishing to the Chrome Web Store
+
+`.github/workflows/publish.yml` runs on a `v*` tag, or manually from the Actions
+tab where you can pick individual themes, the audience, and the version. It ships
+the committed `dist/` with only the manifest version rewritten, so a tag publishes
+exactly the themes in that tag rather than a rebuild against whatever Zed's
+upstream themes look like that day.
+
+`python3 tools/publish.py --version 1.0.7 --dry-run` builds the zips locally
+without touching the API, which is worth running before the first real publish.
+
+Three things have to be set up once:
+
+1. **An item per theme.** The API can update an item but cannot create one, so
+   each theme needs one manual upload in the
+   [Developer Dashboard](https://chrome.google.com/webstore/devconsole). Take the
+   id from the dashboard URL and add it to `store-items.json` as
+   `"theme-slug": "id"`. Only themes listed there are published — with 11 themes
+   that is 11 items and 11 one-time uploads, so it is reasonable to list just the
+   ones you actually want on the store.
+2. **API credentials.** In a Google Cloud project, enable the Chrome Web Store
+   API and create an OAuth client of type Desktop app. Authorize it once for the
+   `https://www.googleapis.com/auth/chromewebstore` scope and exchange the code
+   for a refresh token.
+3. **Repository secrets** `CWS_CLIENT_ID`, `CWS_CLIENT_SECRET` and
+   `CWS_REFRESH_TOKEN`.
+
+Versions must increase — the store rejects a re-upload at the same version — so a
+manual run without an explicit version uses `1.0.<run number>`. Note that the
+`default` target submits for review rather than going live immediately;
+`trustedTesters` is the safer choice for a first run and is the manual default.
