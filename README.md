@@ -1,4 +1,4 @@
-# chrome-gruvbox-theme
+# chrome-zed-themes
 
 Chrome themes generated from Zed theme files, so the colors stay in sync with the
 editor. Stdlib only, no dependencies.
