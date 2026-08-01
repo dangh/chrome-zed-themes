@@ -1,0 +1,102 @@
+{
+  "manifest_version": 3,
+  "version": "1.0.0",
+  "name": "One Dark (Zed)",
+  "description": "One Dark colors from the Zed editor.",
+  "theme": {
+    "images": {
+      "theme_frame": "images/frame.png",
+      "theme_frame_inactive": "images/frame_inactive.png",
+      "theme_frame_incognito": "images/frame.png",
+      "theme_frame_incognito_inactive": "images/frame_inactive.png",
+      "theme_toolbar": "images/toolbar.png",
+      "theme_tab_background": "images/tab.png",
+      "theme_tab_background_inactive": "images/tab_inactive.png",
+      "theme_tab_background_incognito_inactive": "images/tab_inactive.png"
+    },
+    "colors": {
+      "frame": [
+        59,
+        65,
+        77
+      ],
+      "frame_inactive": [
+        59,
+        65,
+        77
+      ],
+      "frame_incognito": [
+        59,
+        65,
+        77
+      ],
+      "frame_incognito_inactive": [
+        59,
+        65,
+        77
+      ],
+      "toolbar": [
+        47,
+        52,
+        62
+      ],
+      "tab_text": [
+        220,
+        224,
+        229
+      ],
+      "tab_background_text": [
+        169,
+        175,
+        188
+      ],
+      "toolbar_text": [
+        220,
+        224,
+        229
+      ],
+      "bookmark_text": [
+        220,
+        224,
+        229
+      ],
+      "toolbar_button_icon": [
+        169,
+        175,
+        188
+      ],
+      "button_background": [
+        47,
+        52,
+        62
+      ],
+      "omnibox_text": [
+        220,
+        224,
+        229
+      ],
+      "ntp_background": [
+        59,
+        65,
+        77
+      ],
+      "ntp_text": [
+        220,
+        224,
+        229
+      ],
+      "ntp_link": [
+        116,
+        173,
+        232
+      ]
+    },
+    "tints": {
+      "buttons": [
+        -1.0,
+        -1.0,
+        -1.0
+      ]
+    }
+  }
+}

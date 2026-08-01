@@ -1,0 +1,6 @@
+__pycache__/
+.zed-themes/
+tools/chrome-prof/
+
+# dist/ holds the generated themes and is committed; ~/.gitignore excludes "dist"
+!dist/

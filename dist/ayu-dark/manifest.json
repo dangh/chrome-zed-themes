@@ -1,0 +1,102 @@
+{
+  "manifest_version": 3,
+  "version": "1.0.0",
+  "name": "Ayu Dark (Zed)",
+  "description": "Ayu Dark colors from the Zed editor.",
+  "theme": {
+    "images": {
+      "theme_frame": "images/frame.png",
+      "theme_frame_inactive": "images/frame_inactive.png",
+      "theme_frame_incognito": "images/frame.png",
+      "theme_frame_incognito_inactive": "images/frame_inactive.png",
+      "theme_toolbar": "images/toolbar.png",
+      "theme_tab_background": "images/tab.png",
+      "theme_tab_background_inactive": "images/tab_inactive.png",
+      "theme_tab_background_incognito_inactive": "images/tab_inactive.png"
+    },
+    "colors": {
+      "frame": [
+        49,
+        51,
+        55
+      ],
+      "frame_inactive": [
+        49,
+        51,
+        55
+      ],
+      "frame_incognito": [
+        49,
+        51,
+        55
+      ],
+      "frame_incognito_inactive": [
+        49,
+        51,
+        55
+      ],
+      "toolbar": [
+        31,
+        33,
+        39
+      ],
+      "tab_text": [
+        191,
+        189,
+        182
+      ],
+      "tab_background_text": [
+        138,
+        137,
+        134
+      ],
+      "toolbar_text": [
+        191,
+        189,
+        182
+      ],
+      "bookmark_text": [
+        191,
+        189,
+        182
+      ],
+      "toolbar_button_icon": [
+        138,
+        137,
+        134
+      ],
+      "button_background": [
+        31,
+        33,
+        39
+      ],
+      "omnibox_text": [
+        191,
+        189,
+        182
+      ],
+      "ntp_background": [
+        49,
+        51,
+        55
+      ],
+      "ntp_text": [
+        191,
+        189,
+        182
+      ],
+      "ntp_link": [
+        90,
+        193,
+        254
+      ]
+    },
+    "tints": {
+      "buttons": [
+        -1.0,
+        -1.0,
+        -1.0
+      ]
+    }
+  }
+}

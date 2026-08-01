@@ -1,0 +1,102 @@
+{
+  "manifest_version": 3,
+  "version": "1.0.0",
+  "name": "Ayu Mirage (Zed)",
+  "description": "Ayu Mirage colors from the Zed editor.",
+  "theme": {
+    "images": {
+      "theme_frame": "images/frame.png",
+      "theme_frame_inactive": "images/frame_inactive.png",
+      "theme_frame_incognito": "images/frame.png",
+      "theme_frame_incognito_inactive": "images/frame_inactive.png",
+      "theme_toolbar": "images/toolbar.png",
+      "theme_tab_background": "images/tab.png",
+      "theme_tab_background_inactive": "images/tab_inactive.png",
+      "theme_tab_background_incognito_inactive": "images/tab_inactive.png"
+    },
+    "colors": {
+      "frame": [
+        70,
+        74,
+        82
+      ],
+      "frame_inactive": [
+        70,
+        74,
+        82
+      ],
+      "frame_incognito": [
+        70,
+        74,
+        82
+      ],
+      "frame_incognito_inactive": [
+        70,
+        74,
+        82
+      ],
+      "toolbar": [
+        53,
+        57,
+        68
+      ],
+      "tab_text": [
+        204,
+        202,
+        194
+      ],
+      "tab_background_text": [
+        154,
+        154,
+        152
+      ],
+      "toolbar_text": [
+        204,
+        202,
+        194
+      ],
+      "bookmark_text": [
+        204,
+        202,
+        194
+      ],
+      "toolbar_button_icon": [
+        154,
+        154,
+        152
+      ],
+      "button_background": [
+        53,
+        57,
+        68
+      ],
+      "omnibox_text": [
+        204,
+        202,
+        194
+      ],
+      "ntp_background": [
+        70,
+        74,
+        82
+      ],
+      "ntp_text": [
+        204,
+        202,
+        194
+      ],
+      "ntp_link": [
+        114,
+        207,
+        254
+      ]
+    },
+    "tints": {
+      "buttons": [
+        -1.0,
+        -1.0,
+        -1.0
+      ]
+    }
+  }
+}

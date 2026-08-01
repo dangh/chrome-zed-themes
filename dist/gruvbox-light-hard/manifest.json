@@ -1,0 +1,102 @@
+{
+  "manifest_version": 3,
+  "version": "1.0.0",
+  "name": "Gruvbox Light Hard (Zed)",
+  "description": "Gruvbox Light Hard colors from the Zed editor.",
+  "theme": {
+    "images": {
+      "theme_frame": "images/frame.png",
+      "theme_frame_inactive": "images/frame_inactive.png",
+      "theme_frame_incognito": "images/frame.png",
+      "theme_frame_incognito_inactive": "images/frame_inactive.png",
+      "theme_toolbar": "images/toolbar.png",
+      "theme_tab_background": "images/tab.png",
+      "theme_tab_background_inactive": "images/tab_inactive.png",
+      "theme_tab_background_incognito_inactive": "images/tab_inactive.png"
+    },
+    "colors": {
+      "frame": [
+        217,
+        200,
+        164
+      ],
+      "frame_inactive": [
+        217,
+        200,
+        164
+      ],
+      "frame_incognito": [
+        217,
+        200,
+        164
+      ],
+      "frame_incognito_inactive": [
+        217,
+        200,
+        164
+      ],
+      "toolbar": [
+        234,
+        215,
+        148
+      ],
+      "tab_text": [
+        40,
+        40,
+        40
+      ],
+      "tab_background_text": [
+        95,
+        86,
+        80
+      ],
+      "toolbar_text": [
+        40,
+        40,
+        40
+      ],
+      "bookmark_text": [
+        40,
+        40,
+        40
+      ],
+      "toolbar_button_icon": [
+        95,
+        86,
+        80
+      ],
+      "button_background": [
+        236,
+        221,
+        181
+      ],
+      "omnibox_text": [
+        40,
+        40,
+        40
+      ],
+      "ntp_background": [
+        217,
+        200,
+        164
+      ],
+      "ntp_text": [
+        40,
+        40,
+        40
+      ],
+      "ntp_link": [
+        11,
+        102,
+        120
+      ]
+    },
+    "tints": {
+      "buttons": [
+        -1.0,
+        -1.0,
+        -1.0
+      ]
+    }
+  }
+}

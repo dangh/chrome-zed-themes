@@ -1,0 +1,102 @@
+{
+  "manifest_version": 3,
+  "version": "1.0.0",
+  "name": "One Light (Zed)",
+  "description": "One Light colors from the Zed editor.",
+  "theme": {
+    "images": {
+      "theme_frame": "images/frame.png",
+      "theme_frame_inactive": "images/frame_inactive.png",
+      "theme_frame_incognito": "images/frame.png",
+      "theme_frame_incognito_inactive": "images/frame_inactive.png",
+      "theme_toolbar": "images/toolbar.png",
+      "theme_tab_background": "images/tab.png",
+      "theme_tab_background_inactive": "images/tab_inactive.png",
+      "theme_tab_background_incognito_inactive": "images/tab_inactive.png"
+    },
+    "colors": {
+      "frame": [
+        220,
+        220,
+        221
+      ],
+      "frame_inactive": [
+        220,
+        220,
+        221
+      ],
+      "frame_incognito": [
+        220,
+        220,
+        221
+      ],
+      "frame_incognito_inactive": [
+        220,
+        220,
+        221
+      ],
+      "toolbar": [
+        235,
+        235,
+        236
+      ],
+      "tab_text": [
+        36,
+        37,
+        41
+      ],
+      "tab_background_text": [
+        88,
+        88,
+        90
+      ],
+      "toolbar_text": [
+        36,
+        37,
+        41
+      ],
+      "bookmark_text": [
+        36,
+        37,
+        41
+      ],
+      "toolbar_button_icon": [
+        88,
+        88,
+        90
+      ],
+      "button_background": [
+        235,
+        235,
+        236
+      ],
+      "omnibox_text": [
+        36,
+        37,
+        41
+      ],
+      "ntp_background": [
+        220,
+        220,
+        221
+      ],
+      "ntp_text": [
+        36,
+        37,
+        41
+      ],
+      "ntp_link": [
+        92,
+        120,
+        226
+      ]
+    },
+    "tints": {
+      "buttons": [
+        -1.0,
+        -1.0,
+        -1.0
+      ]
+    }
+  }
+}
