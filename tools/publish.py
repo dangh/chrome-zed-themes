@@ -107,42 +107,30 @@ def main():
         token = access_token()
         print("credentials OK: refresh token exchanged for an access token")
         auth = (("Authorization", f"Bearer {token}"), ("x-goog-api-version", "2"))
-        broken = []
+        # DRAFT is the only projection this endpoint accepts; asking for
+        # PUBLISHED returns HTTP 400 telling you to use DRAFT. So ownership cannot
+        # be confirmed here before an item has ever been published: an item with no
+        # pending draft answers NOT_FOUND, and so does one these credentials cannot
+        # see. Only a transport error is treated as a failure.
+        failed = []
         for slug, item_id in items.items():
-            # A 200 here does not mean the item is ours: the API answers 200 with
-            # uploadState NOT_FOUND for an id it cannot resolve for this account,
-            # so both projections are probed and only SUCCESS counts as reachable.
-            states = {}
-            for projection in ("DRAFT", "PUBLISHED"):
-                got = request(f"{ITEM_URL.format(id=item_id)}?projection={projection}",
-                              headers=auth, fatal=False)
-                states[projection] = got.get("_error") or got.get("uploadState", "?")
-            ok = "SUCCESS" in states.values()
-            print(f"  {slug}: {'ok' if ok else 'NOT REACHABLE'} "
-                  f"draft={states['DRAFT']} published={states['PUBLISHED']}")
-            if not ok:
-                broken.append(slug)
-        if broken:
-            print("\nNOT_FOUND on every projection has two innocent readings and one\n"
-                  "real problem, and the API does not distinguish them:\n"
-                  "  - the item was submitted but has never been published, so it has\n"
-                  "    neither a pending draft nor a published version yet\n"
-                  "  - the item is mid-review, which clears the draft\n"
-                  "  - the refresh token belongs to a different Google account than the\n"
-                  "    one that owns the items\n"
-                  "If the accounts match, re-run this once review has cleared: an\n"
-                  "approved item reports published=SUCCESS.")
-            sys.exit(f"unreachable items: {', '.join(broken)}")
-        if items:
-            print(f"all {len(items)} configured item(s) reachable")
+            got = request(ITEM_URL.format(id=item_id) + "?projection=DRAFT",
+                          headers=auth, fatal=False)
+            if "_error" in got:
+                print(f"  {slug}: FAILED {got['_error'].splitlines()[0]}")
+                failed.append(slug)
+            else:
+                state = got.get("uploadState", "?")
+                note = "" if state == "SUCCESS" else "  (no pending draft; see below)"
+                print(f"  {slug}: draft={state}{note}")
+        if failed:
+            sys.exit(f"\nunreachable items: {', '.join(failed)}")
+        print("\nA NOT_FOUND draft is expected for an item that has never been "
+              "published or is\nmid-review, and is indistinguishable from an item "
+              "these credentials cannot\nsee. The first successful upload is what "
+              "proves write access.")
         return
-    if slugs:
-        unknown = [s for s in slugs if s not in items]
-        if unknown:
-            sys.exit(f"not in store-items.json: {', '.join(unknown)}")
-        items = {s: items[s] for s in slugs}
-    if not items:
-        sys.exit("no items configured in store-items.json, nothing to publish")
+
 
     token = None if args.dry_run else access_token()
     auth = () if args.dry_run else (("Authorization", f"Bearer {token}"),
