@@ -82,12 +82,16 @@ def zip_theme(folder, version):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--version", required=True, help="manifest version to ship")
+    ap.add_argument("--version", help="manifest version to ship")
     ap.add_argument("--target", default="default", choices=["default", "trustedTesters"])
     ap.add_argument("--dist", default=HERE / "dist", type=Path)
     ap.add_argument("--dry-run", action="store_true", help="build the zips, skip the API")
     ap.add_argument("--check", action="store_true",
                     help="verify the credentials mint an access token, then stop")
+    ap.add_argument("--publish-only", action="store_true",
+                    help="publish each item's existing draft without uploading a "
+                         "package -- for listing changes made in the dashboard, "
+                         "which no API can set")
     ap.add_argument("--themes", default="",
                     help="whitespace-separated slugs, so callers need no shell splitting")
     ap.add_argument("slugs", nargs="*", help="themes to publish; default is every configured one")
@@ -132,26 +136,35 @@ def main():
         return
 
 
+    if not (args.version or args.publish_only or args.check):
+        sys.exit("--version is required unless --publish-only or --check")
+
     token = None if args.dry_run else access_token()
     auth = () if args.dry_run else (("Authorization", f"Bearer {token}"),
                                     ("x-goog-api-version", "2"))
     failed = []
     for slug, item_id in items.items():
-        folder = args.dist / slug
-        if not folder.is_dir():
-            sys.exit(f"{folder} does not exist -- run build.py first")
-        blob = zip_theme(folder, args.version)
-        print(f"{slug}: {len(blob)} bytes, version {args.version}", end="", flush=True)
-        if args.dry_run:
-            print("  (dry run)")
-            continue
+        if args.publish_only:
+            print(f"{slug}: publishing existing draft", end="", flush=True)
+            if args.dry_run:
+                print("  (dry run)")
+                continue
+        else:
+            folder = args.dist / slug
+            if not folder.is_dir():
+                sys.exit(f"{folder} does not exist -- run build.py first")
+            blob = zip_theme(folder, args.version)
+            print(f"{slug}: {len(blob)} bytes, version {args.version}", end="", flush=True)
+            if args.dry_run:
+                print("  (dry run)")
+                continue
 
-        got = request(UPLOAD_URL.format(id=item_id) + "?uploadType=media",
-                      data=blob, method="PUT", headers=auth)
-        if got.get("uploadState") not in ("SUCCESS", "IN_PROGRESS"):
-            print(f"\n  upload failed: {json.dumps(got)}")
-            failed.append(slug)
-            continue
+            got = request(UPLOAD_URL.format(id=item_id) + "?uploadType=media",
+                          data=blob, method="PUT", headers=auth)
+            if got.get("uploadState") not in ("SUCCESS", "IN_PROGRESS"):
+                print(f"\n  upload failed: {json.dumps(got)}")
+                failed.append(slug)
+                continue
 
         got = request(PUBLISH_URL.format(id=item_id)
                       + f"?publishTarget={args.target}", method="POST", headers=auth)

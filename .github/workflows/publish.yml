@@ -28,6 +28,10 @@ on:
         description: "Only verify the credentials, publish nothing"
         type: boolean
         default: false
+      publish_only:
+        description: "Publish each item's existing draft without uploading a package"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -74,11 +78,16 @@ jobs:
           TARGET: ${{ inputs.target || 'default' }}
           VERSION: ${{ steps.meta.outputs.version }}
           CHECK: ${{ inputs.check_only }}
+          PUBLISH_ONLY: ${{ inputs.publish_only }}
         # Every value is quoted from the environment: nothing here is interpolated
         # into the shell, and publish.py splits and validates the slugs itself.
         run: |
           if [ "$CHECK" = true ]; then
             python3 tools/publish.py --version "$VERSION" --check
+            exit $?
+          fi
+          if [ "$PUBLISH_ONLY" = true ]; then
+            python3 tools/publish.py --publish-only --target "$TARGET" --themes "$THEMES"
             exit $?
           fi
           python3 tools/publish.py \
