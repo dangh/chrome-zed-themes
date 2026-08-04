@@ -160,14 +160,22 @@ def main():
                 continue
 
             got = request(UPLOAD_URL.format(id=item_id) + "?uploadType=media",
-                          data=blob, method="PUT", headers=auth)
+                          data=blob, method="PUT", headers=auth, fatal=False)
             if got.get("uploadState") not in ("SUCCESS", "IN_PROGRESS"):
                 print(f"\n  upload failed: {json.dumps(got)}")
                 failed.append(slug)
                 continue
 
+        # Per item, not fatal: one item in review must not stop the other ten.
         got = request(PUBLISH_URL.format(id=item_id)
-                      + f"?publishTarget={args.target}", method="POST", headers=auth)
+                      + f"?publishTarget={args.target}", method="POST", headers=auth,
+                      fatal=False)
+        if "_error" in got:
+            first = got["_error"].splitlines()
+            detail = next((l.strip() for l in first if '"message"' in l), first[0])
+            print(f"  failed: {detail}")
+            failed.append(slug)
+            continue
         statuses = got.get("status", [])
         print(f"  uploaded, publish status {statuses or 'OK'}")
         # Anything other than OK or the review-queue notice is a real failure.
