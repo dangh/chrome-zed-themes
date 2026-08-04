@@ -31,6 +31,10 @@ SHOT_W, SHOT_H = 1280, 800
 # missing"). 440x280 is 1.571:1 against the screenshot's 1.6:1, so the shot is
 # cropped to the tile's aspect before scaling rather than squashed into it.
 TILE_W, TILE_H = 440, 280
+# Optional, and only needed to be eligible for featuring. 2.5:1 against the
+# screenshot's 1.6:1, so it is cropped from the top rather than centred: a centred
+# crop of that ratio would cut the tab strip off, which is the point of the shot.
+MARQUEE_W, MARQUEE_H = 1400, 560
 
 spec = importlib.util.spec_from_file_location("build", HERE / "build.py")
 build = importlib.util.module_from_spec(spec)
@@ -198,6 +202,52 @@ def tile(shot, out):
                    check=True, capture_output=True)
 
 
+def read_png(path):
+    """Minimal decoder for the screenshots this script produced."""
+    data = path.read_bytes()
+    pos, idat = 8, b""
+    while pos < len(data):
+        n = struct.unpack(">I", data[pos:pos + 4])[0]
+        tag = data[pos + 4:pos + 8]
+        if tag == b"IHDR":
+            w, h, depth, ctype = struct.unpack(">IIBB", data[pos + 8:pos + 18])
+        elif tag == b"IDAT":
+            idat += data[pos + 8:pos + 8 + n]
+        pos += n + 12
+    bpp = 4 if ctype == 6 else 3
+    raw = zlib.decompress(idat)
+    stride = w * bpp
+    rows, prev = [], bytearray(stride)
+    for y in range(h):
+        f = raw[y * (stride + 1)]
+        line = bytearray(raw[y * (stride + 1) + 1:(y + 1) * (stride + 1)])
+        for i in range(stride):
+            a = line[i - bpp] if i >= bpp else 0
+            b = prev[i]
+            c = prev[i - bpp] if i >= bpp else 0
+            if f == 1:
+                line[i] = (line[i] + a) & 255
+            elif f == 2:
+                line[i] = (line[i] + b) & 255
+            elif f == 3:
+                line[i] = (line[i] + (a + b) // 2) & 255
+            elif f == 4:
+                pp = a + b - c
+                pa, pb, pc = abs(pp - a), abs(pp - b), abs(pp - c)
+                line[i] = (line[i] + (a if pa <= pb and pa <= pc else b if pb <= pc else c)) & 255
+        rows.append([tuple(line[x * bpp:x * bpp + 3]) for x in range(w)])
+        prev = line
+    return rows
+
+
+def marquee(shot, out):
+    """1400x560 marquee tile: top-anchored crop of the screenshot, then scaled."""
+    keep = round(SHOT_W * MARQUEE_H / MARQUEE_W)
+    write_png(out, read_png(shot)[:keep])
+    subprocess.run(["sips", "--resampleHeightWidth", str(MARQUEE_H), str(MARQUEE_W),
+                    str(out)], check=True, capture_output=True)
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     shots = "--no-shots" not in sys.argv[1:]
@@ -224,7 +274,8 @@ def main():
             print(" + screenshot-1280x800.png", end="")
         if shot.is_file():
             tile(shot, out / "promo-440x280.png")
-            print(" + promo-440x280.png", end="")
+            marquee(shot, out / "marquee-1400x560.png")
+            print(" + promo-440x280.png + marquee-1400x560.png", end="")
         print()
 
 
