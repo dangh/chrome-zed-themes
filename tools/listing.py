@@ -107,7 +107,7 @@ def screenshot(slug, out):
     # infobar on the tab around the install, and a later tab comes up without it.
     env = dict(os.environ, WIN_W=str(SHOT_W), WIN_H=str(SHOT_H),
                START_URL="chrome://new-tab-page")
-    subprocess.run(["pkill", "-f", "chrome-gruvbox-preview-profile"], capture_output=True)
+    subprocess.run(["pkill", "-f", "chrome-zed-preview-profile"], capture_output=True)
     subprocess.run([sys.executable, str(HERE / "tools/preview.py"), str(HERE / "dist" / slug),
                     str(raw), "chrome://settings", "chrome://new-tab-page"],
                    check=True, env=env,

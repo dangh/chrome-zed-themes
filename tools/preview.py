@@ -15,7 +15,7 @@ import tempfile
 import time
 
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-PROF = os.path.join(tempfile.gettempdir(), "chrome-gruvbox-preview-profile")
+PROF = os.path.join(tempfile.gettempdir(), "chrome-zed-preview-profile")
 X, Y = 40, 80
 # Store screenshots must be exactly 1280x800, so the window can be asked for that
 # aspect and the retina capture downscaled with no cropping or distortion.
